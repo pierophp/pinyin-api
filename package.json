@@ -12,5 +12,9 @@
   "license": "MIT",
   "devDependencies": {
     "prettier": "^1.18.2"
+  },
+  "dependencies": {
+    "itty-router": "^2.4.4",
+    "serverless-cloudflare-workers": "^1.2.0"
   }
 }
