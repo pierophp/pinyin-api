@@ -1,7 +1,7 @@
-name = "pinyin-api"
+name = "api"
 type = "javascript"
 
-account_id = ""
+account_id = "a1d57c12278d3a80e0bf93a2bfd69fdf"
 workers_dev = true
 route = ""
 zone_id = ""
