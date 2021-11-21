@@ -1,5 +1,7 @@
 // import { PrismaClient } from '.prisma/client';
+
 import { Router } from 'itty-router';
+import { prisma } from './src/prisma';
 
 // Create a new router
 const router = Router();
@@ -7,8 +9,8 @@ const router = Router();
 /*
 Our index route, a simple hello world.
 */
-router.get('/', () => {
-  // const prisma = new PrismaClient();
+router.get('/', async () => {
+  const word = await prisma.cjk.findFirst({ where: { ideogram: '我們' } });
 
   return new Response(
     'Hello, world228d! This is the root page of your Worker template.',
