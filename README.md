@@ -5,5 +5,5 @@ wrangler dev index.ts --local
 #### Deploy
 
 ```
-wrangler publish
+wrangler publish index.ts --name=api
 ```

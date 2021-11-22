@@ -1,0 +1,303 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model cjk {
+  id                       Int       @id @default(autoincrement()) @db.UnsignedInt
+  ideogram                 String?   @db.VarChar(190)
+  ideogram_raw             String?   @db.VarChar(190)
+  pronunciation            String?   @db.VarChar(190)
+  pronunciation_unaccented String?   @db.VarChar(190)
+  pronunciation_spaced     String?   @db.VarChar(190)
+  pronunciation_taiwan     String?   @db.VarChar(190)
+  definition_unihan        String?   @db.Text
+  frequency                Int?
+  usage                    Int?
+  language_id              Int       @db.UnsignedInt
+  created_at               DateTime? @db.DateTime(0)
+  updated_at               DateTime? @db.DateTime(0)
+  type                     String?   @db.VarChar(255)
+  definition_cedict        String?   @db.Text
+  definition_pt            String?   @db.Text
+  measure_words            String?   @db.Text
+  simplified               Boolean?
+  traditional              Boolean?
+  variants                 String?   @db.Text
+  definition_ct_pt         String?   @db.Text
+  definition_ct_es         String?   @db.Text
+  definition_ct_en         String?   @db.Text
+  hsk                      Int?
+  main                     Boolean?
+  erhua                    Boolean?
+  definition_glosbe_pt     String?   @db.Text
+  definition_glosbe_es     String?   @db.Text
+  definition_glosbe_en     String?   @db.Text
+  definition_2pinyin_pt    String?   @db.Text
+  definition_2pinyin_es    String?   @db.Text
+  definition_2pinyin_en    String?   @db.Text
+  classifications          String?   @db.Text
+  synonyms                 String?   @db.Text
+  antonyms                 String?   @db.Text
+  is_separable             Boolean?
+  definition_3lines_en     String?   @db.Text
+  definition_3lines_es     String?   @db.Text
+  traditional_exclusive    Boolean?
+  source                   String?   @db.VarChar(45)
+
+  @@unique([ideogram, pronunciation, simplified, traditional], map: "cjk_ideogram_pronunciation_unique")
+  @@index([ideogram], map: "cjk_ideogram_index")
+  @@index([ideogram_raw], map: "cjk_ideogram_raw_index")
+  @@index([language_id], map: "cjk_language_id_index")
+  @@index([pronunciation], map: "cjk_pronunciation_index")
+  @@index([pronunciation_unaccented], map: "cjk_pronunciation_unaccented_index")
+}
+
+model cjk_has_phrase {
+  cjk_id    Int @db.UnsignedInt
+  phrase_id Int @db.UnsignedInt
+
+  @@id([cjk_id, phrase_id])
+  @@index([cjk_id], map: "cjk_has_phrase_cjk_id_index")
+  @@index([phrase_id], map: "cjk_has_phrase_phrase_id_index")
+}
+
+model language {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  code       String?   @unique(map: "language_code_unique") @db.VarChar(255)
+  name       String?   @db.VarChar(255)
+  created_at DateTime? @db.DateTime(0)
+  updated_at DateTime? @db.DateTime(0)
+}
+
+model migrations {
+  id             Int      @id @default(autoincrement()) @db.UnsignedInt
+  name           String?  @db.VarChar(255)
+  batch          Int?
+  migration_time DateTime @default(now()) @db.Timestamp(0)
+}
+
+model migrations_lock {
+  is_locked Int @id
+}
+
+model moedict {
+  id                            Int     @id @default(autoincrement())
+  ideogram_original             String? @db.VarChar(190)
+  ideogram                      String? @db.VarChar(190)
+  ideogram_simplified           String? @db.VarChar(190)
+  stroke_count                  Int?
+  pronunciation_unaccented      String? @db.VarChar(190)
+  pronunciation_case            String? @db.VarChar(190)
+  pronunciation_case_unaccented String? @db.VarChar(190)
+  pronunciation_spaced          String? @db.VarChar(190)
+  definition                    Json?
+}
+
+model my_cjk {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  cjk_id     Int?      @db.UnsignedInt
+  user_id    Int       @db.UnsignedInt
+  created_at DateTime? @db.DateTime(0)
+  updated_at DateTime? @db.DateTime(0)
+  ideogram   String?   @db.VarChar(190)
+  source     String?   @db.VarChar(100)
+  type       String?   @db.VarChar(100)
+
+  @@unique([user_id, source, type, ideogram], map: "my_cjk_user_id_source_type_ideogram_unique")
+  @@index([cjk_id], map: "my_cjk_cjk_id_index")
+  @@index([user_id], map: "my_cjk_user_id_index")
+}
+
+model phrase {
+  id                  Int       @id @default(autoincrement()) @db.UnsignedInt
+  phrase              String?   @db.Text
+  pronunciation       String?   @db.Text
+  provider            String?   @db.VarChar(100)
+  language_id         Int       @db.UnsignedInt
+  provider_id         Int       @db.UnsignedInt
+  provider_created_at DateTime? @db.DateTime(0)
+  provider_updated_at DateTime? @db.DateTime(0)
+  created_at          DateTime? @db.DateTime(0)
+  updated_at          DateTime? @db.DateTime(0)
+
+  @@unique([provider, provider_id, language_id], map: "phrase_provider_provider_id_language_id_unique")
+  @@index([language_id], map: "phrase_language_id_index")
+  @@index([provider_id], map: "phrase_provider_id_index")
+}
+
+model phrase_reference {
+  from_phrase_id Int @db.UnsignedInt
+  to_phrase_id   Int @db.UnsignedInt
+
+  @@id([from_phrase_id, to_phrase_id])
+  @@index([from_phrase_id], map: "phrase_reference_from_phrase_id_index")
+  @@index([to_phrase_id], map: "phrase_reference_to_phrase_id_index")
+}
+
+model publication_frequency {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  code       String?   @db.VarChar(100)
+  ideogram   String?   @db.VarChar(255)
+  total      String?   @db.VarChar(255)
+  created_at DateTime? @db.DateTime(0)
+  updated_at DateTime? @db.DateTime(0)
+
+  @@unique([code, ideogram], map: "publication_frequency_code_ideogram_unique")
+}
+
+model tmp_cedict {
+  id                            Int      @id @default(autoincrement())
+  ideogram                      String?  @db.VarChar(190)
+  ideogram_raw                  String?  @db.VarChar(190)
+  pronunciation                 String?  @db.VarChar(190)
+  pronunciation_unaccented      String?  @db.VarChar(190)
+  pronunciation_case            String?  @db.VarChar(190)
+  pronunciation_case_unaccented String?  @db.VarChar(190)
+  pronunciation_taiwan          String?  @db.VarChar(190)
+  pronunciation_spaced          String?  @db.VarChar(190)
+  definition                    String?  @db.Text
+  measure_words                 String?  @db.Text
+  variants                      String?  @db.Text
+  simplified                    Boolean?
+  traditional                   Boolean?
+  erhua                         Boolean?
+
+  @@index([ideogram], map: "tmp_cedict_ideogram_index")
+  @@index([pronunciation], map: "tmp_cedict_pronunciation_index")
+}
+
+model tmp_cjk {
+  id                       Int       @id @default(0) @db.UnsignedInt
+  ideogram                 String?   @db.VarChar(255)
+  pronunciation            String?   @db.VarChar(255)
+  pronunciation_unaccented String?   @db.VarChar(255)
+  definition_unihan        String?   @db.Text
+  frequency                Int?
+  usage                    Int?
+  language_id              Int       @db.UnsignedInt
+  created_at               DateTime? @db.DateTime(0)
+  updated_at               DateTime? @db.DateTime(0)
+  type                     String?   @db.VarChar(255)
+  definition_cedict        String?   @db.Text
+  definition_pt            String?   @db.Text
+  measure_words            String?   @db.Text
+  simplified               Boolean?
+  traditional              Boolean?
+  variants                 String?   @db.Text
+  definition_ct_pt         String?   @db.Text
+  definition_ct_es         String?   @db.Text
+  definition_ct_en         String?   @db.Text
+  hsk                      Int?
+  main                     Boolean?
+  definition_glosbe_pt     String?   @db.Text
+  definition_glosbe_es     String?   @db.Text
+  definition_glosbe_en     String?   @db.Text
+}
+
+model tmp_phrase {
+  id                  Int       @id @default(autoincrement()) @db.UnsignedInt
+  phrase              String?   @db.Text
+  pronunciation       String?   @db.Text
+  provider            String?   @db.VarChar(100)
+  language_id         Int       @db.UnsignedInt
+  provider_id         Int       @db.UnsignedInt
+  provider_created_at DateTime? @db.DateTime(0)
+  provider_updated_at DateTime? @db.DateTime(0)
+  created_at          DateTime? @db.DateTime(0)
+  updated_at          DateTime? @db.DateTime(0)
+
+  @@unique([provider, provider_id, language_id], map: "tmp_phrase_provider_provider_id_language_id_unique")
+  @@index([language_id], map: "tmp_phrase_language_id_index")
+  @@index([provider_id], map: "tmp_phrase_provider_id_index")
+}
+
+model tmp_phrase_reference {
+  from_phrase_id Int @db.UnsignedInt
+  to_phrase_id   Int @db.UnsignedInt
+
+  @@id([from_phrase_id, to_phrase_id])
+  @@index([from_phrase_id], map: "tmp_phrase_reference_from_phrase_id_index")
+  @@index([to_phrase_id], map: "tmp_phrase_reference_to_phrase_id_index")
+}
+
+model tmp_three_lines_en {
+  id                            Int      @id @default(autoincrement())
+  ideogram                      String?  @db.VarChar(190)
+  ideogram_raw                  String?  @db.VarChar(190)
+  pronunciation                 String?  @db.VarChar(190)
+  pronunciation_unaccented      String?  @db.VarChar(190)
+  pronunciation_case            String?  @db.VarChar(190)
+  pronunciation_case_unaccented String?  @db.VarChar(190)
+  pronunciation_spaced          String?  @db.VarChar(190)
+  definition                    String?  @db.Text
+  variants                      String?  @db.Text
+  simplified                    Boolean?
+  traditional                   Boolean?
+
+  @@index([ideogram], map: "tmp_three_lines_ideogram_index")
+  @@index([pronunciation], map: "tmp_three_lines_pronunciation_index")
+}
+
+model tmp_three_lines_es {
+  id                            Int      @id @default(autoincrement())
+  ideogram                      String?  @db.VarChar(190)
+  ideogram_raw                  String?  @db.VarChar(190)
+  pronunciation                 String?  @db.VarChar(190)
+  pronunciation_unaccented      String?  @db.VarChar(190)
+  pronunciation_case            String?  @db.VarChar(190)
+  pronunciation_case_unaccented String?  @db.VarChar(190)
+  pronunciation_spaced          String?  @db.VarChar(190)
+  definition                    String?  @db.Text
+  variants                      String?  @db.Text
+  simplified                    Boolean?
+  traditional                   Boolean?
+
+  @@index([ideogram], map: "tmp_three_lines_ideogram_index")
+  @@index([pronunciation], map: "tmp_three_lines_pronunciation_index")
+}
+
+model user {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String?   @db.VarChar(255)
+  email      String?   @unique(map: "user_email_unique") @db.VarChar(255)
+  profile_id String?   @unique(map: "user_profile_id_unique") @db.VarChar(255)
+  token      String?   @db.VarChar(255)
+  created_at DateTime? @db.DateTime(0)
+  updated_at DateTime? @db.DateTime(0)
+  admin      Boolean?
+  provider   String?   @default("google") @db.VarChar(30)
+
+  @@index([token], map: "user_token_index")
+}
+
+model video_history {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  video      String?   @db.VarChar(100)
+  url        String?   @db.VarChar(255)
+  user_id    Int       @db.UnsignedInt
+  created_at DateTime? @db.DateTime(0)
+  updated_at DateTime? @db.DateTime(0)
+
+  @@index([user_id], map: "video_history_user_id_index")
+  @@index([video], map: "video_history_video_index")
+}
+
+model video_track {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  video       String?   @unique(map: "video_track_video_unique") @db.VarChar(100)
+  track_url   String?   @db.VarChar(255)
+  description String?   @db.VarChar(255)
+  created_at  DateTime? @db.DateTime(0)
+  updated_at  DateTime? @db.DateTime(0)
+  videos      String?   @db.Text
+  images      String?   @db.Text
+  code        String?   @db.VarChar(100)
+  language    String?   @db.VarChar(100)
+
+  @@index([code], map: "video_track_code_index")
+}

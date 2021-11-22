@@ -1,3 +1,4 @@
+// import { PrismaClient } from '.prisma/client';
 import { Router } from 'itty-router'
 
 // Create a new router
@@ -7,8 +8,10 @@ const router = Router()
 Our index route, a simple hello world.
 */
 router.get('/', () => {
+  // const prisma = new PrismaClient();
+
   return new Response(
-    'Hello, world228! This is the root page of your Worker template.',
+    'Hello, world228d! This is the root page of your Worker template.',
   )
 })
 

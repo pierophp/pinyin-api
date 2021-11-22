@@ -6,12 +6,6 @@ workers_dev = true
 route = ""
 zone_id = ""
 compatibility_date = "2021-11-19"
-
-[build]
-command = "yarn && yarn build"
-
 [build.upload]
-format = "modules"
-main = "./index.mjs"
-dir = "./dist"
+main = "./index.ts"
 
