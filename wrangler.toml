@@ -1,8 +1,17 @@
 name = "api"
-type = "webpack"
+type = "javascript"
 
 account_id = "a1d57c12278d3a80e0bf93a2bfd69fdf"
 workers_dev = true
 route = ""
 zone_id = ""
 compatibility_date = "2021-11-19"
+
+[build]
+command = "yarn && yarn build"
+
+[build.upload]
+format = "modules"
+main = "./index.mjs"
+dir = "./dist"
+

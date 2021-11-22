@@ -8,7 +8,7 @@ Our index route, a simple hello world.
 */
 router.get('/', () => {
   return new Response(
-    'Hello, world! This is the root page of your Worker template.',
+    'Hello, world22! This is the root page of your Worker template.',
   )
 })
 
@@ -19,9 +19,10 @@ Try visit /example/hello and see the response.
 */
 router.get('/example/:text', ({ params }) => {
   // Decode text like "Hello%20world" into "Hello world"
-  let input = decodeURIComponent(params.text)
+  let input = decodeURIComponent(params!.text)
 
   // Construct a buffer from our input
+  // @ts-ignore
   let buffer = Buffer.from(input, 'utf8')
 
   // Serialise the buffer into a base64 string
@@ -43,13 +44,18 @@ $ curl -X POST <worker> -H "Content-Type: application/json" -d '{"abc": "def"}'
 */
 router.post('/post', async request => {
   // Create a base object with some fields.
+  
   let fields = {
+      // @ts-ignore
     asn: request.cf.asn,
+    // @ts-ignore
     colo: request.cf.colo,
   }
 
   // If the POST data is JSON then attach it to our response.
+  // @ts-ignore
   if (request.headers.get('Content-Type') === 'application/json') {
+    // @ts-ignore
     fields['json'] = await request.json()
   }
 
@@ -70,10 +76,9 @@ Visit any page that doesn't exist (e.g. /foobar) to see it in action.
 */
 router.all('*', () => new Response('404, not found!', { status: 404 }))
 
-/*
-This snippet ties our worker to the router we deifned above, all incoming requests
-are passed to the router where your routes are called and the response is sent.
-*/
-addEventListener('fetch', e => {
-  e.respondWith(router.handle(e.request))
-})
+
+export default {
+    async fetch(request: Request, env: any, ctx: ExecutionContext) {
+        return router.handle(request);   
+    }
+}
