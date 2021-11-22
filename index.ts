@@ -1,5 +1,6 @@
 // import { PrismaClient } from '.prisma/client';
 import { Router } from 'itty-router'
+import { prisma } from './src/prisma'
 
 // Create a new router
 const router = Router()
@@ -7,11 +8,12 @@ const router = Router()
 /*
 Our index route, a simple hello world.
 */
-router.get('/', () => {
-  // const prisma = new PrismaClient();
+router.get('/', async () => {
+  const word = await prisma.cjk.findFirst({ where: { ideogram: '我們' } })
 
   return new Response(
-    'Hello, world228d! This is the root page of your Worker template.',
+    'Hello, world228d! This is the root page of your Worker template. ', // +
+    // word?.pronunciation,
   )
 })
 
@@ -47,9 +49,9 @@ $ curl -X POST <worker> -H "Content-Type: application/json" -d '{"abc": "def"}'
 */
 router.post('/post', async request => {
   // Create a base object with some fields.
-  
+
   let fields = {
-      // @ts-ignore
+    // @ts-ignore
     asn: request.cf.asn,
     // @ts-ignore
     colo: request.cf.colo,
@@ -79,9 +81,8 @@ Visit any page that doesn't exist (e.g. /foobar) to see it in action.
 */
 router.all('*', () => new Response('404, not found!', { status: 404 }))
 
-
 export default {
-    async fetch(request: Request, env: any, ctx: ExecutionContext) {
-        return router.handle(request);   
-    }
+  async fetch(request: Request, env: any, ctx: ExecutionContext) {
+    return router.handle(request)
+  },
 }
