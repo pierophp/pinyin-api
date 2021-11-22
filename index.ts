@@ -8,7 +8,7 @@ Our index route, a simple hello world.
 */
 router.get('/', () => {
   return new Response(
-    'Hello, world22! This is the root page of your Worker template.',
+    'Hello, world228! This is the root page of your Worker template.',
   )
 })
 
